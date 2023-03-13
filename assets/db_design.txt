@@ -1,0 +1,49 @@
+Collection DB:
+- Users
+- Clinics
+- Pets
+- Apointments
+- RatingReviews
+
+User:
+- email
+- password
+- fullname
+- address
+- birthdate
+- profile_img
+- auth_key
+
+Pets:
+- user_id
+- pet_name
+- pet_type
+- pet_gender
+- pet_img
+
+Clinic:
+- clinic_name
+- clinic_doctor
+- clinic_address
+- clinic_img
+- clinic_img_banner
+- clinic_lat
+- clinic_long
+- clinic_rating
+- services
+
+Apointments:
+- schedule_datetime
+- datetime_created
+- reason
+- payment
+- status
+- pet_owner_id
+- clinic_id
+- pet_list_ids
+
+RatingReviews:
+- user_name
+- clinic_id
+- comment
+- rate
