@@ -11,7 +11,9 @@ import 'package:vetclinicapp/Model/userModel.dart';
 import 'package:vetclinicapp/Pages/LoadingScreen/loadingscreen.dart';
 import 'package:vetclinicapp/Pages/_helper/image_loader.dart';
 import 'package:vetclinicapp/Pages/apointment/show_appointment.dart';
+import 'package:vetclinicapp/Services/firebase_messaging.dart';
 import 'package:vetclinicapp/Style/library_style_and_constant.dart';
+import 'package:vetclinicapp/Utils/SharedPreferences.dart';
 
 class Apointments extends StatefulWidget {
   const Apointments({Key? key}) : super(key: key);
@@ -59,12 +61,13 @@ class _ApointmentsState extends State<Apointments> {
     refresh = !refresh;
   }
 
-  void removeApointment(ClinicApointmentModel apointment) async {
+  void removeApointment(ClinicApointmentModel apointment, UserModel user) async {
     if(await LoadingScreen1.showAlertDialog1(context,'Are you sure to cancel?',18)){
       await ApointmentController.removeApointment(apointment.id??"");
       setState(() {
         apointments.removeWhere((data) => data['apointment'] == apointment);
       });
+      FirebaseMessagingService.sendMessageNotification('Appointment', "Doc ${await DataStorage.getData('username')}", 'Decline Apointment', '${user.fullname} your Apointment Schedule Has Been Cancel ', user.fcm_tokens!);
       CherryToast.success(title: Text("Remove Successfuly!")).show(context);
     }
   }
@@ -106,7 +109,7 @@ class _ApointmentsState extends State<Apointments> {
           // width: 90,
           child: IconButton(
             icon: FaIcon(Icons.cancel,size: 35,color: text4Color,),
-            onPressed: () async => removeApointment(apointment!),
+            onPressed: () async => removeApointment(apointment!,user!),
           ),
         ),
         onTap: ()=> showAppointment(apointment!),

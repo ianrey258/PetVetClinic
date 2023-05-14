@@ -40,7 +40,7 @@ class _LoginState extends State<Login> {
       _key.currentState!.save();
       LoadingScreen1.showLoadingNoMsg(context);
       try {
-        var result = await ClinicController.loginClinic(text);
+        var result = await ClinicController.verifyClinic(text);
         return result;
       } catch (e) {
         return false;
@@ -113,7 +113,7 @@ class _LoginState extends State<Login> {
         if(_key.currentState!.validate()){
           if(await validation()){
             Navigator.pop(context);
-            Navigator.popAndPushNamed(context, '/dashboard');
+            Navigator.pushNamed(context, '/otp', arguments: text);
           }else{
             Navigator.pop(context);
             CherryToast.error(title: Text("Check Username/Password!", style: TextStyle(fontSize: 12),),).show(context);

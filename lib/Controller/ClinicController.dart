@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:vetclinicapp/Controller/FileController.dart';
 import 'package:vetclinicapp/Model/clinicModel.dart';
+import 'package:vetclinicapp/Services/firebase_messaging.dart';
 import 'package:vetclinicapp/Utils/SharedPreferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -12,15 +13,27 @@ class ClinicController{
   static final FirebaseAuth firabaseAuth = FirebaseAuth.instance;
   static FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-  static loginClinic(List<TextEditingController> data) async {
+  static verifyClinic(List<TextEditingController> data) async {
     try{
       UserCredential fb_auth = await firabaseAuth.signInWithEmailAndPassword(email: data[0].value.text.toString().toLowerCase(), password: data[1].value.text.toString());
       if(!await isInEmail(data[0].value.text.toString().toLowerCase())){
         return false;
       }
+      return true;
+    }catch(e){
+      debugPrint("Error on: ${e.toString()}");
+      return false;
+    }
+  }
+  
+  static loginClinic(List<TextEditingController> data) async {
+    try{
+      UserCredential fb_auth = await firabaseAuth.signInWithEmailAndPassword(email: data[0].value.text.toString().toLowerCase(), password: data[1].value.text.toString());
       await DataStorage.setData('email', data[0].value.text.toString().toLowerCase());
       DocumentSnapshot user_doc = await firestore.collection('clinics').doc(fb_auth.user?.uid??"").get();
       ClinicModel clinic = ClinicModel.fromMap(jsonDecode(jsonEncode(user_doc.data())));
+
+      await checkClinicFCMToken(clinic);
       await DataStorage.setData('id', clinic.id);
       await DataStorage.setData('username',clinic.clinic_doctor);
       await DataStorage.setData('fullname',clinic.clinic_doctor);
@@ -62,11 +75,10 @@ class ClinicController{
                           data[7].value.text.toString(),
                           data[8].value.text.toString(),
                           "0",
-                          services
+                          services,
+                          []
                         );
-      print('Nag Error');
       await updateClinic(clinic);
-      print('Nag Error Update');
       await DataStorage.setData('id', clinic.id);
       await DataStorage.setData('username',clinic.clinic_doctor);
       await DataStorage.setData('fullname',clinic.clinic_doctor);
@@ -165,6 +177,16 @@ class ClinicController{
     String final_path = "/${clinic_id??''}/banner/${filename}";
     await FileController.setFile(final_path, file_path);
     return final_path;
+  }
+
+  static Future checkClinicFCMToken(ClinicModel clinic) async {
+    //check fcm tokens
+      List fcm_tokens = clinic.fcm_tokens??[];
+      String device_fcm_token = await FirebaseMessagingService.getFCMToken();
+      if(!fcm_tokens.contains(device_fcm_token)){
+        clinic.fcm_tokens = fcm_tokens + [device_fcm_token];
+        await updateClinic(clinic);
+      }
   }
   
   static Future<String> updateClinicLogo(String file_path) async {

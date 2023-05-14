@@ -12,6 +12,7 @@ class FileController{
   static Future<String> setFile(String server_path,String local_path) async {
     try{
       firebaseStorage.ref(server_path).putFile(File(local_path)).whenComplete(()async{});
+
       return server_path;
     } catch (e){
       debugPrint(e.toString());

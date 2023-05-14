@@ -13,7 +13,9 @@ import 'package:vetclinicapp/Model/clinicModel.dart';
 import 'package:vetclinicapp/Model/petModel.dart';
 import 'package:vetclinicapp/Model/userModel.dart';
 import 'package:vetclinicapp/Pages/_helper/image_loader.dart';
+import 'package:vetclinicapp/Services/firebase_messaging.dart';
 import 'package:vetclinicapp/Style/library_style_and_constant.dart';
+import 'package:vetclinicapp/Utils/SharedPreferences.dart';
 
 
 class ShowAppointment extends StatefulWidget {
@@ -58,10 +60,15 @@ class _ShowAppointmentState extends State<ShowAppointment> {
         pets.add(pet);
       });  
     });
+    if(apointment?.clinic_read_status == "" || apointment?.clinic_read_status == "false" || apointment?.pet_owner_read_status == null){
+      apointment?.clinic_read_status = 'true';
+      await ApointmentController.setApointment(apointment!);
+    }
     if(apointment != null){
       setState(() {
         clinic = _clinic;
         user = _user;
+        apointment?.clinic_read_status = 'true';
         text[0].text = apointment?.reason??"";
         DateTime sched = DateTime.parse(apointment?.schedule_datetime??"");
         text[1].text = "${DateFormat.yMMMEd().add_jm().format(sched)}";
@@ -81,8 +88,10 @@ class _ShowAppointmentState extends State<ShowAppointment> {
       final time = await showTimePicker(context: context,initialTime:TimeOfDay.fromDateTime(sched ?? DateTime.now()),);
       setState(() {
         apointment?.schedule_datetime = DateTimeField.combine(date, time).toString();
+        apointment?.pet_owner_read_status = 'false';
       });
       if(await ApointmentController.updateApointment(apointment!)){
+        FirebaseMessagingService.sendMessageNotification('Appointment', "Doc ${await DataStorage.getData('username')}", 'Reschedule Apointment', '${user?.fullname} your schedule will be moved on ${apointment?.schedule_datetime}', user!.fcm_tokens!);
         Navigator.pop(context);
         CherryToast.success(title: Text('Appointment Postponed')).show(context);
       }else{

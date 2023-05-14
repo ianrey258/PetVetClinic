@@ -21,7 +21,7 @@ class Register3 extends StatefulWidget {
 class _Register3State extends State<Register3> {
   List<TextEditingController> text = [];
   final _key = GlobalKey<FormState>();
-  int? last_index = 0;
+  int last_index = 0;
   bool obscure = true;
 
   @override
@@ -72,8 +72,8 @@ class _Register3State extends State<Register3> {
         onPressed: () async {
           Position pos = await GeolocationModule.getPosition();
           setState(() {
-            text[last_index! + 1].text = pos.latitude.toString();
-            text[last_index! + 2].text = pos.longitude.toString();
+            text[last_index + 1].text = pos.latitude.toString();
+            text[last_index + 2].text = pos.longitude.toString();
           });
         },
         icon: Container(),
@@ -167,7 +167,7 @@ class _Register3State extends State<Register3> {
                         Padding(
                           padding: const EdgeInsets.all(5.0),
                           child: Center(
-                            child: Text("Location: (${text[last_index! + 1].text},${text[last_index! + 2].text})"),
+                            child: Text("Location: (${text[last_index + 1].text},${text[last_index + 2].text})"),
                           ),
                         ),
                         Padding(

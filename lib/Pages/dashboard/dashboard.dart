@@ -14,6 +14,7 @@ import 'package:vetclinicapp/Model/clinicModel.dart';
 import 'package:vetclinicapp/Model/userModel.dart';
 import 'package:vetclinicapp/Pages/_helper/image_loader.dart';
 import 'package:vetclinicapp/Pages/apointment/show_appointment.dart';
+import 'package:vetclinicapp/Services/firebase_messaging.dart';
 import 'package:vetclinicapp/Style/library_style_and_constant.dart';
 import 'package:vetclinicapp/Utils/SharedPreferences.dart';
 
@@ -48,6 +49,9 @@ class _DashboardState extends State<Dashboard> {
         text.add(TextEditingController());
       }
     });
+    FirebaseMessagingService.initPermission();
+    FirebaseMessagingService.initListenerForground(context);
+    FirebaseMessagingService.awesomeNotificationButtonListener(context);
     initLoadData();
   }
 

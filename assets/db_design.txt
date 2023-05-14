@@ -4,8 +4,9 @@ Collection DB:
 - Pets
 - Apointments
 - RatingReviews
+- Chat
 
-User:
+Users:
 - email
 - password
 - fullname
@@ -21,7 +22,7 @@ Pets:
 - pet_gender
 - pet_img
 
-Clinic:
+Clinics:
 - clinic_name
 - clinic_doctor
 - clinic_address
@@ -33,17 +34,31 @@ Clinic:
 - services
 
 Apointments:
+- pet_owner_id
+- clinic_id
 - schedule_datetime
 - datetime_created
 - reason
 - payment
 - status
-- pet_owner_id
-- clinic_id
 - pet_list_ids
+- pet_owner_read_status
+- clinic_read_status
 
 RatingReviews:
 - user_name
 - clinic_id
 - comment
 - rate
+
+Chat:
+- id
+- users_id
+- messages:{
+  - datetime
+  - id
+  - message
+  - type
+  - user_id
+  - read_status
+}

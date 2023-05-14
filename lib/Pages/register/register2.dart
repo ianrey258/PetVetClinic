@@ -65,6 +65,9 @@ class _Register2State extends State<Register2> {
         if(text[last_index! + 2].text == ""){
           return CherryToast.error(title: Text("Please Select a Banner.")).show(context); 
         }
+        if(!validation()){
+          return null; 
+        }
         Navigator.pushNamed(context, '/register3',arguments: text);
       },
     );

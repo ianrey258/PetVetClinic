@@ -51,6 +51,12 @@ dependencies:
   image_picker: ^0.8.6+3
   firebase_core: ^2.7.0
   firebase_storage: ^11.0.14
+  fast_cached_network_image: ^1.1.1
+  firebase_messaging: ^14.5.0
+  awesome_notifications: ^0.6.21
+  shimmer: ^2.0.0
+  email_otp: ^2.0.1
+  pinput: ^2.2.31
 
 
   # The following adds the Cupertino Icons font to your application.
