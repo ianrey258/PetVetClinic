@@ -44,8 +44,10 @@ class _ApointmentsState extends State<Apointments> {
   initLoadData() async {
     apointments = [];
     List _apointments = await ApointmentController.getApointments();
+    debugPrint(_apointments.length.toString());
     _apointments.forEach((apointment) async {
       if(apointment.status.toString() == status[1]){
+        debugPrint(apointment.pet_owner_id);
         UserModel _user = await UserController.getUser(apointment.pet_owner_id??'');
         setState(() {  
           apointments.add({

@@ -62,7 +62,7 @@ class _ShowAppointmentState extends State<ShowAppointment> {
     });
     if(apointment?.clinic_read_status == "" || apointment?.clinic_read_status == "false" || apointment?.pet_owner_read_status == null){
       apointment?.clinic_read_status = 'true';
-      await ApointmentController.setApointment(apointment!);
+      await ApointmentController.updateApointment(apointment!);
     }
     if(apointment != null){
       setState(() {

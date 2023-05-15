@@ -63,6 +63,7 @@ class ClinicController{
       print(json.decode(data[9].text,reviver: (key, value) => value.toString()));
       List<dynamic> dyn_services = json.decode(data[9].text).map((data) => data.toString()).toList();
       List<String> services = dyn_services.map((data) => data.toString()).toList();
+      List fcm_tokens = [await FirebaseMessagingService.getFCMToken()];
       print(services);
       ClinicModel clinic = ClinicModel(
                           fb_auth.user?.uid??"", 
@@ -76,7 +77,7 @@ class ClinicController{
                           data[8].value.text.toString(),
                           "0",
                           services,
-                          []
+                          fcm_tokens
                         );
       await updateClinic(clinic);
       await DataStorage.setData('id', clinic.id);

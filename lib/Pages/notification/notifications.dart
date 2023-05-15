@@ -12,7 +12,9 @@ import 'package:vetclinicapp/Pages/LoadingScreen/loadingscreen.dart';
 import 'package:vetclinicapp/Pages/_helper/image_loader.dart';
 import 'package:vetclinicapp/Pages/apointment/show_appointment.dart';
 import 'package:vetclinicapp/Pages/notification/show_appointment_notif.dart';
+import 'package:vetclinicapp/Services/firebase_messaging.dart';
 import 'package:vetclinicapp/Style/library_style_and_constant.dart';
+import 'package:vetclinicapp/Utils/SharedPreferences.dart';
 
 class Notifications extends StatefulWidget {
   const Notifications({Key? key}) : super(key: key);
@@ -61,10 +63,11 @@ class _NotificationsState extends State<Notifications> {
     refresh = !refresh;
   }
 
-  Future setStatusApointment(ClinicApointmentModel apointment,String _status) async {
+  Future setStatusApointment(ClinicApointmentModel apointment,String _status,UserModel? user) async {
     if(_status == status[1]){
       apointment.status = status[1];
       await ApointmentController.updateApointment(apointment);
+      FirebaseMessagingService.sendMessageNotification('Appointment', "Doc ${await DataStorage.getData('username')}", 'Accept Apointment', '${user?.fullname} your Apointment Schedule Has Been Accepted ', user!.fcm_tokens!);
       setState(() {
         apointments.removeWhere((data) => data['apointment'] == apointment);
       });
@@ -73,6 +76,7 @@ class _NotificationsState extends State<Notifications> {
     if(_status == status[2] && LoadingScreen1.showAlertDialog1(context, "Are you sure to Decline?", 18)){
       apointment.status = status[2];
       await ApointmentController.updateApointment(apointment);
+      FirebaseMessagingService.sendMessageNotification('Appointment', "Doc ${await DataStorage.getData('username')}", 'Decline Apointment', '${user?.fullname} your Apointment Schedule Has Been Cancel ', user!.fcm_tokens!);
       setState(() {
         apointments.removeWhere((data) => data['apointment'] == apointment);
       });
@@ -90,13 +94,16 @@ class _NotificationsState extends State<Notifications> {
     return text6Color;
   }
 
-  Future<dynamic> showAppointment(ClinicApointmentModel _apointment) async {
-    var result = showDialog(
+  Future<dynamic> showAppointment(ClinicApointmentModel _apointment,UserModel? user) async {
+    var result = await showDialog(
       context: context,
       builder: (context) => ShowAppointmentNotif(apointment: _apointment)
     );
+    if(result == true){
+      await setStatusApointment(_apointment,status[1],user);
+    }
     if(result == false){
-      await setStatusApointment(_apointment,status[2]);
+      await setStatusApointment(_apointment,status[2],user);
     }
   }
 
@@ -117,16 +124,16 @@ class _NotificationsState extends State<Notifications> {
             children: [
               IconButton(
                 icon: FaIcon(Icons.check_circle,size: 35,color: text9Color,),
-                onPressed: () async => setStatusApointment(apointment!,status[1]),
+                onPressed: () async => setStatusApointment(apointment!,status[1],user),
               ),
               IconButton(
                 icon: FaIcon(Icons.cancel,size: 35,color: text4Color,),
-                onPressed: () async => setStatusApointment(apointment!,status[2]),
+                onPressed: () async => setStatusApointment(apointment!,status[2],user),
               ),
             ],
           ),
         ),
-        onTap: ()async => showAppointment(apointment!),
+        onTap: ()async => showAppointment(apointment!,user),
       ),
     );   
   }

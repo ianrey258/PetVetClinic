@@ -1,4 +1,5 @@
 // ignore_for_file: prefer_const_constructors
+import 'package:cherry_toast/cherry_toast.dart';
 import 'package:flutter/gestures.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -14,6 +15,7 @@ import 'package:vetclinicapp/Model/clinicModel.dart';
 import 'package:vetclinicapp/Model/userModel.dart';
 import 'package:vetclinicapp/Pages/_helper/image_loader.dart';
 import 'package:vetclinicapp/Pages/apointment/show_appointment.dart';
+import 'package:vetclinicapp/Pages/loadingscreen/loadingscreen.dart';
 import 'package:vetclinicapp/Services/firebase_messaging.dart';
 import 'package:vetclinicapp/Style/library_style_and_constant.dart';
 import 'package:vetclinicapp/Utils/SharedPreferences.dart';
@@ -266,11 +268,30 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  Future showAppointment(ClinicApointmentModel _apointment){
-    return showDialog(
+  void removeApointment(ClinicApointmentModel apointment, UserModel user) async {
+    if(await LoadingScreen1.showAlertDialog1(context,'Are you sure to cancel?',18)){
+      await ApointmentController.removeApointment(apointment.id??"");
+      setState(() {
+        apointments.removeWhere((data) => data['apointment'] == apointment);
+      });
+      FirebaseMessagingService.sendMessageNotification('Appointment', "Doc ${await DataStorage.getData('username')}", 'Remove Apointment', '${user.fullname} your Apointment Schedule Has Been Cancel ', user.fcm_tokens!);
+      CherryToast.success(title: Text("Remove Successfuly!")).show(context);
+    }
+  }
+
+  Future<dynamic> showAppointment(ClinicApointmentModel _apointment,UserModel? user) async {
+    // return showDialog(
+    //   context: context,
+    //   builder: (context) => ShowAppointment(apointment: _apointment)
+    // );
+
+    var result = await showDialog(
       context: context,
       builder: (context) => ShowAppointment(apointment: _apointment)
     );
+    if(result == false){
+      removeApointment(_apointment,user!);
+    }
   }
 
   Widget apointmentCard(Map data){
@@ -300,7 +321,7 @@ class _DashboardState extends State<Dashboard> {
             onPressed: () => Navigator.pushNamed(context, '/message',arguments: user),
           ),
         ),
-        onTap: ()=> showAppointment(apointment!),
+        onTap: ()=>  showAppointment(apointment!,user),
       ),
     );   
   }
