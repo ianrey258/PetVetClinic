@@ -66,17 +66,21 @@ class _NotificationsState extends State<Notifications> {
   Future setStatusApointment(ClinicApointmentModel apointment,String _status,UserModel? user) async {
     if(_status == status[1]){
       apointment.status = status[1];
+      apointment.clinic_read_status = 'true';
+      apointment.pet_owner_read_status = 'false';
       await ApointmentController.updateApointment(apointment);
-      FirebaseMessagingService.sendMessageNotification('Appointment', "Doc ${await DataStorage.getData('username')}", 'Accept Apointment', '${user?.fullname} your Apointment Schedule Has Been Accepted ', user!.fcm_tokens!);
+      FirebaseMessagingService.sendMessageNotification(notification_type[1], "Doc ${await DataStorage.getData('username')}", 'Accept Apointment', '${user?.fullname} your Apointment Schedule Has Been Accepted ', user!.fcm_tokens!,{});
       setState(() {
         apointments.removeWhere((data) => data['apointment'] == apointment);
       });
       CherryToast.success(title: Text("Accept Apointment!")).show(context);
     }
-    if(_status == status[2] && LoadingScreen1.showAlertDialog1(context, "Are you sure to Decline?", 18)){
+    if(_status == status[2] && await LoadingScreen1.showAlertDialog1(context, "Are you sure to Decline?", 18)){
       apointment.status = status[2];
+      apointment.clinic_read_status = 'true';
+      apointment.pet_owner_read_status = 'false';
       await ApointmentController.updateApointment(apointment);
-      FirebaseMessagingService.sendMessageNotification('Appointment', "Doc ${await DataStorage.getData('username')}", 'Decline Apointment', '${user?.fullname} your Apointment Schedule Has Been Cancel ', user!.fcm_tokens!);
+      FirebaseMessagingService.sendMessageNotification(notification_type[1], "Doc ${await DataStorage.getData('username')}", 'Decline Apointment', '${user?.fullname} your Apointment Schedule Has Been Cancel ', user!.fcm_tokens!,{});
       setState(() {
         apointments.removeWhere((data) => data['apointment'] == apointment);
       });
@@ -156,7 +160,7 @@ class _NotificationsState extends State<Notifications> {
           elevation: 0,
           centerTitle: true,
           title: Image.asset(logoImg,fit: BoxFit.contain),
-          leading: Container(),
+          // leading: Container(),
           actions: [
             IconButton(
               onPressed: (){

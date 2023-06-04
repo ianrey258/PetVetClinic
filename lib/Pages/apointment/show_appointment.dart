@@ -91,7 +91,7 @@ class _ShowAppointmentState extends State<ShowAppointment> {
         apointment?.pet_owner_read_status = 'false';
       });
       if(await ApointmentController.updateApointment(apointment!)){
-        FirebaseMessagingService.sendMessageNotification('Appointment', "Doc ${await DataStorage.getData('username')}", 'Reschedule Apointment', '${user?.fullname} your schedule will be moved on ${apointment?.schedule_datetime}', user!.fcm_tokens!);
+        FirebaseMessagingService.sendMessageNotification(notification_type[1], "Doc ${await DataStorage.getData('username')}", 'Reschedule Apointment', '${user?.fullname} your schedule will be moved on ${apointment?.schedule_datetime}', user!.fcm_tokens!,{});
         Navigator.pop(context);
         CherryToast.success(title: Text('Appointment Postponed')).show(context);
       }else{

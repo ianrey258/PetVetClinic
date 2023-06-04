@@ -57,7 +57,7 @@ class _MessageState extends State<Message> {
     if(text[0].text != ''){
       MessageModel message = MessageModel('', clinic?.id, text[0].text, 'text', DateTime.now().millisecondsSinceEpoch.toString());
       await MessageController.sendMessage(message_id?.id??"", message);
-      FirebaseMessagingService.sendMessageNotification('Appointment', "Doc ${await DataStorage.getData('username')}", 'Message', text[0].text, user!.fcm_tokens!);
+      FirebaseMessagingService.sendMessageNotification(notification_type[0], "Doc ${await DataStorage.getData('username')}", 'Message', text[0].text, user!.fcm_tokens!,clinic!.toMap());
       _sc.animateTo(0,duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
     }
     text[0].clear();

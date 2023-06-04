@@ -19,6 +19,7 @@ import 'package:vetclinicapp/Pages/loadingscreen/loadingscreen.dart';
 import 'package:vetclinicapp/Services/firebase_messaging.dart';
 import 'package:vetclinicapp/Style/library_style_and_constant.dart';
 import 'package:vetclinicapp/Utils/SharedPreferences.dart';
+import 'package:badges/badges.dart' as badges;
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -29,6 +30,7 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> {
   List<TextEditingController> text = [];
+  int unread_appointment = 0;
   final _key = GlobalKey<FormState>();
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   bool obscure = true;
@@ -55,6 +57,7 @@ class _DashboardState extends State<Dashboard> {
     FirebaseMessagingService.initListenerForground(context);
     FirebaseMessagingService.awesomeNotificationButtonListener(context);
     initLoadData();
+    setUnreadApointmentBadge();
   }
 
   initLoadData()async {
@@ -94,6 +97,15 @@ class _DashboardState extends State<Dashboard> {
     return false;
   }
 
+  Future setUnreadApointmentBadge() async {
+    List user_appointment_list = await ApointmentController.getUnreadApointments()??[];
+    if(unread_appointment != user_appointment_list.length){
+      setState(() {
+        unread_appointment = user_appointment_list.length;
+      });
+    }
+  }
+
   logout(){
     ClinicController.logoutClinic();
     Navigator.popAndPushNamed(context,'/loading_screen');
@@ -102,15 +114,23 @@ class _DashboardState extends State<Dashboard> {
   Widget drawerContainerItem(icon,text){
     return ListTile(
       leading: FaIcon(icon,size: 25,color: text1Color,),
-      title: Center(
-        child: Text(text,style: TextStyle(fontSize: 25),),
-      ),
+      title: "Notification" == text && unread_appointment != 0 ? Container(
+        child: badges.Badge(
+          position: badges.BadgePosition.topEnd(top: -10, end: -12),
+          showBadge: true,
+          ignorePointer: false,
+          onTap: () {},
+          badgeContent: Text(unread_appointment.toString()),
+          child: Text(text,style: TextStyle(fontSize: 25),),
+        ), 
+      ) : Text(text,style: TextStyle(fontSize: 25),),
       trailing: Icon(Icons.arrow_forward_ios_sharp,color: text1Color,),
       onTap: (){
         Navigator.pop(context);
         text == "Home" ? _scaffoldKey.currentState?.closeDrawer()
         : text == "Notification" ? Navigator.pushNamed(context, '/notifications')
         : text == "Apointment" ? Navigator.pushNamed(context, '/apointments')
+        : text == "Messages" ? Navigator.pushNamed(context, '/messages')
         : text == "History" ? ''
         : text == "Reviews" ? ''
         : text == "Settings" ? Navigator.pushNamed(context, "/clinic_profile")
@@ -161,6 +181,7 @@ class _DashboardState extends State<Dashboard> {
         drawerContainerItem(Icons.home,'Home'),
         drawerContainerItem(FontAwesomeIcons.message,'Notification'),
         drawerContainerItem(Icons.schedule_outlined,'Apointment'),
+        drawerContainerItem(FontAwesomeIcons.message,'Messages'),
         drawerContainerItem(Icons.history,'History'),
         drawerContainerItem(Icons.reviews_outlined,'Reviews'),
         drawerContainerItem(FontAwesomeIcons.userGear,'Settings'),
@@ -274,7 +295,7 @@ class _DashboardState extends State<Dashboard> {
       setState(() {
         apointments.removeWhere((data) => data['apointment'] == apointment);
       });
-      FirebaseMessagingService.sendMessageNotification('Appointment', "Doc ${await DataStorage.getData('username')}", 'Remove Apointment', '${user.fullname} your Apointment Schedule Has Been Cancel ', user.fcm_tokens!);
+      FirebaseMessagingService.sendMessageNotification(notification_type[1], "Doc ${await DataStorage.getData('username')}", 'Remove Apointment', '${user.fullname} your Apointment Schedule Has Been Cancel ', user.fcm_tokens!,{});
       CherryToast.success(title: Text("Remove Successfuly!")).show(context);
     }
   }
@@ -382,6 +403,7 @@ class _DashboardState extends State<Dashboard> {
           ],
           onTap: (value) {
             if(value == 0){
+              setUnreadApointmentBadge();
               _scaffoldKey.currentState?.openDrawer();
             }
             if(value == 2){

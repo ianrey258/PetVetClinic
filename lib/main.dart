@@ -1,5 +1,5 @@
 // ignore_for_file: prefer_const_constructors
-
+import 'dart:convert';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:face_camera/face_camera.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
@@ -11,6 +11,7 @@ import 'package:vetclinicapp/Pages/apointment/apointmets.dart';
 import 'package:vetclinicapp/Pages/apointment/show_appointment.dart';
 import 'package:vetclinicapp/Pages/apointment/video_call.dart';
 import 'package:vetclinicapp/Pages/apointment/message.dart';
+import 'package:vetclinicapp/Pages/chat_messages/messages.dart';
 import 'package:vetclinicapp/Pages/dashboard/dashboard.dart';
 import 'package:vetclinicapp/Pages/forgot_password/forgot_password.dart';
 import 'package:vetclinicapp/Pages/forgot_password/reset_password.dart';
@@ -23,39 +24,30 @@ import 'package:vetclinicapp/Pages/register/register1.dart';
 import 'package:vetclinicapp/Pages/register/register2.dart';
 import 'package:vetclinicapp/Pages/register/register3.dart';
 import 'package:vetclinicapp/Pages/register/register4.dart';
+import 'package:vetclinicapp/Services/firebase_messaging.dart';
 import 'package:vetclinicapp/Style/_custom_color.dart';
-
-Future<void> backgroundHandler(RemoteMessage message) async {
-  String? title = message.notification!.title;
-  String? body = message.notification!.body;
-  print('Handling a background message ${message}');
-
-  await Firebase.initializeApp();
-  // AwesomeNotifications().createNotification(
-  //   content: NotificationContent(
-  //     id: 123, 
-  //     channelKey: 'notification',
-  //     title: title,
-  //     body: body,
-  //     category: NotificationCategory.Message,
-  //     wakeUpScreen: true,
-  //     fullScreenIntent: true,
-  //     backgroundColor: secondaryColor
-  //   ),
-  //   actionButtons: [
-  //     NotificationActionButton(key: 'open', label: 'OPEN',color: primaryColor),
-  //     NotificationActionButton(key: 'close', label: 'CLOSE',color: primaryColor)
-  //   ]
-  // );
-}
+import 'package:flutter_dynamic_icon/flutter_dynamic_icon.dart';
 
 void initAwesomeNotification(){
   AwesomeNotifications().initialize(null, [
     NotificationChannel(
       channelKey: 'notification', 
       channelName: 'notification', 
-      channelDescription: 'Notification'
-      )
+      channelDescription: 'Notification',
+      importance: NotificationImportance.High,
+    ),
+    NotificationChannel(
+      channelKey: 'appointment', 
+      channelName: 'appointment', 
+      channelDescription: 'Appointment',
+      importance: NotificationImportance.High,
+    ),
+    NotificationChannel(
+      channelKey: 'message', 
+      channelName: 'message', 
+      channelDescription: 'Message',
+      importance: NotificationImportance.High,
+    )
   ]);
 }
 
@@ -65,7 +57,7 @@ void main() async {
   await FaceCamera.initialize(); 
   initAwesomeNotification();
   Firebase.initializeApp(); 
-  FirebaseMessaging.onBackgroundMessage(backgroundHandler);
+  FirebaseMessaging.onBackgroundMessage(FirebaseMessagingService.initListenerBackground);
   await FastCachedImageConfig.init(clearCacheAfter: const Duration(days: 15));
   runApp(const MyApp());
 }
@@ -105,6 +97,7 @@ class MyApp extends StatelessWidget {
         '/reset_password': (context) => const ResetPassword(),
         '/dashboard': (context) => const Dashboard(),
         '/message': (context) => const Message(),
+        '/messages': (context) => const Messages(),
         '/video_call': (context) => const VideoCall(),
         '/loading_screen': (context) => const LoadingScreen(),
         '/clinic_profile': (context) => const ClinicProfile(),

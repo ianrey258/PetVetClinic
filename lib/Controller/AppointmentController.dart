@@ -25,6 +25,25 @@ class ApointmentController{
       return [];
     }
   }
+
+  static Future<List> getUnreadApointments() async {
+    try{
+      List<ClinicApointmentModel> apointments = [];
+      String clinic_id = await DataStorage.getData('id');
+      QuerySnapshot apointment_list = await firestore.collection('appointments').where('clinic_id',isEqualTo: clinic_id).get();
+      apointment_list.docs.forEach((doc) {
+        try{
+          if(doc.get('clinic_read_status') == 'false'){
+            apointments.add(ClinicApointmentModel.fromMap(jsonDecode(jsonEncode(doc.data()))));
+          }
+        }catch(e){}
+      });
+      return apointments;
+    }catch (e){
+      debugPrint("Error on: ${e.toString()}");
+      return [];
+    }
+  }
   
   static Future<ClinicApointmentModel> getApointment(String id) async {
     try{

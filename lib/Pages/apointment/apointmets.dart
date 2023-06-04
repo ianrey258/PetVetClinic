@@ -69,7 +69,7 @@ class _ApointmentsState extends State<Apointments> {
       setState(() {
         apointments.removeWhere((data) => data['apointment'] == apointment);
       });
-      FirebaseMessagingService.sendMessageNotification('Appointment', "Doc ${await DataStorage.getData('username')}", 'Decline Apointment', '${user.fullname} your Apointment Schedule Has Been Cancel ', user.fcm_tokens!);
+      FirebaseMessagingService.sendMessageNotification(notification_type[1], "Doc ${await DataStorage.getData('username')}", 'Decline Apointment', '${user.fullname} your Apointment Schedule Has Been Cancel ', user.fcm_tokens!,{});
       CherryToast.success(title: Text("Remove Successfuly!")).show(context);
     }
   }
@@ -142,7 +142,7 @@ class _ApointmentsState extends State<Apointments> {
           elevation: 0,
           centerTitle: true,
           title: Image.asset(logoImg,fit: BoxFit.contain),
-          leading: Container(),
+          // leading: Container(),
           actions: [
             IconButton(
               onPressed: (){

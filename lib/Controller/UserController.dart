@@ -17,9 +17,13 @@ class UserController{
   static FirebaseStorage firebaseStorage= FirebaseStorage.instance;
 
   static Future<UserModel> getUser(String id) async {
-    DocumentSnapshot user_doc = await firestore.collection('users').doc(id).get();
-    UserModel user = UserModel.fromMap(jsonDecode(jsonEncode(user_doc.data())));
-    return user;
+    try{
+      DocumentSnapshot user_doc = await firestore.collection('users').doc(id).get();
+      UserModel user = UserModel.fromMap(jsonDecode(jsonEncode(user_doc.data())));
+      return user;
+    }catch(e){
+      return UserModel(id, '', '', '', '', '', '', '', '', []);
+    }
   }
 
 }
