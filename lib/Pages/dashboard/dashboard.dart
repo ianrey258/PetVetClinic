@@ -132,7 +132,7 @@ class _DashboardState extends State<Dashboard> {
         : text == "Apointment" ? Navigator.pushNamed(context, '/apointments')
         : text == "Messages" ? Navigator.pushNamed(context, '/messages')
         : text == "History" ? ''
-        : text == "Reviews" ? ''
+        : text == "Reviews" ? Navigator.pushNamed(context, '/rating_reviews') 
         : text == "Settings" ? Navigator.pushNamed(context, "/clinic_profile")
         : text == "Logout" ? logout()
         : null;
@@ -182,9 +182,9 @@ class _DashboardState extends State<Dashboard> {
         drawerContainerItem(FontAwesomeIcons.message,'Notification'),
         drawerContainerItem(Icons.schedule_outlined,'Apointment'),
         drawerContainerItem(FontAwesomeIcons.message,'Messages'),
-        drawerContainerItem(Icons.history,'History'),
+        // drawerContainerItem(Icons.history,'History'),
         drawerContainerItem(Icons.reviews_outlined,'Reviews'),
-        drawerContainerItem(FontAwesomeIcons.userGear,'Settings'),
+        // drawerContainerItem(FontAwesomeIcons.userGear,'Settings'),
         drawerContainerItem(Icons.logout,'Logout'),
       ],
     );

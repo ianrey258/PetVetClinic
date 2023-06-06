@@ -20,6 +20,7 @@ import 'package:vetclinicapp/Pages/login/login.dart';
 import 'package:vetclinicapp/Pages/notification/notifications.dart';
 import 'package:vetclinicapp/Pages/notification/show_appointment_notif.dart';
 import 'package:vetclinicapp/Pages/profile/clinic_profile.dart';
+import 'package:vetclinicapp/Pages/rating_and_reviews/rating_reviews.dart';
 import 'package:vetclinicapp/Pages/register/register1.dart';
 import 'package:vetclinicapp/Pages/register/register2.dart';
 import 'package:vetclinicapp/Pages/register/register3.dart';
@@ -102,6 +103,7 @@ class MyApp extends StatelessWidget {
         '/loading_screen': (context) => const LoadingScreen(),
         '/clinic_profile': (context) => const ClinicProfile(),
         '/notifications': (context) => const Notifications(),
+        '/rating_reviews': (context) => const RatingReviews(),
         '/apointments': (context) => const Apointments(),
         '/show_apointment': (context) => const ShowAppointment(),
         '/show_apointment_notif': (context) => const ShowAppointmentNotif(),

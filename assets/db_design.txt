@@ -14,6 +14,7 @@ Users:
 - birthdate
 - profile_img
 - auth_key
+- fcm_tokens
 
 Pets:
 - user_id
@@ -32,6 +33,8 @@ Clinics:
 - clinic_long
 - clinic_rating
 - services
+- fcm_tokens
+- rating_review:RatingReviews
 
 Apointments:
 - pet_owner_id
@@ -46,10 +49,10 @@ Apointments:
 - clinic_read_status
 
 RatingReviews:
-- user_name
-- clinic_id
+- user_id
 - comment
 - rate
+- datetime
 
 Chat:
 - id
