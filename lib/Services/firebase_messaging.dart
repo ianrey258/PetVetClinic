@@ -114,6 +114,9 @@ class FirebaseMessagingService{
     try{
       AwesomeNotifications().actionStream.listen((event) async { 
         Map<String,dynamic>? payload = event.payload;
+        if(event.channelKey == notification_type[2]){
+          Navigator.pushNamed(context,'/rating_reviews');
+        }
         if(event.channelKey == notification_type[1]){
           Navigator.pushNamed(context,'/apointments');
         }

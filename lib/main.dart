@@ -48,6 +48,12 @@ void initAwesomeNotification(){
       channelName: 'message', 
       channelDescription: 'Message',
       importance: NotificationImportance.High,
+    ),
+    NotificationChannel(
+      channelKey: 'rating', 
+      channelName: 'rating', 
+      channelDescription: 'Rating',
+      importance: NotificationImportance.High,
     )
   ]);
 }
