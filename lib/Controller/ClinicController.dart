@@ -217,6 +217,53 @@ class ClinicController{
     await updateClinic(clinic);
     return final_path;
   }
+
+  static Stream getClinicScheduleSnapshots(String clinic_id){
+    return firestore
+           .collection("clinics")
+           .doc(clinic_id)
+           .collection('schedule')
+           .orderBy('order', descending: false)
+           // .limit(limit)
+           .snapshots();
+  }
+  
+  static Future setClinicSchedule(ClinicScheduleModel data) async {
+    try{
+      final clinic_id = await DataStorage.getData('id');
+      final schedule = await firestore.collection('clinics').doc(clinic_id).collection('schedule').add(data.toMap());
+      data.id = schedule.id;
+      await updateClinicSchedule(data);
+      return true;
+    }catch(e){
+      debugPrint("Error on: ${e.toString()}");
+      return false;
+    }
+  }
+  
+  static Future updateClinicSchedule(ClinicScheduleModel data) async {
+    try{
+      final clinic_id = await DataStorage.getData('id');
+      final schedule = await firestore.collection('clinics').doc(clinic_id).collection('schedule').doc(data.id);
+      schedule.set(data.toMap());
+      return true;
+    }catch(e){
+      debugPrint("Error on: ${e.toString()}");
+      return false;
+    }
+  }
+  
+  static Future removeClinicSchedule(ClinicScheduleModel data) async {
+    try{
+      final clinic_id = await DataStorage.getData('id');
+      final schedule = await firestore.collection('clinics').doc(clinic_id).collection('schedule').doc(data.id);
+      schedule.delete();
+      return true;
+    }catch(e){
+      debugPrint("Error on: ${e.toString()}");
+      return false;
+    }
+  }
   
   static logoutClinic() async {
     try{

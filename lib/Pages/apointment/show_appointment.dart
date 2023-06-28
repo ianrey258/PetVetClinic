@@ -35,7 +35,7 @@ class _ShowAppointmentState extends State<ShowAppointment> {
   String schedule = ''; 
   ClinicModel? clinic;
   UserModel? user;
-  ClinicApointmentModel? apointment;
+  ClinicApointmentModel apointment = ClinicApointmentModel('','','','','','','','',[],'','');
   List<String> status = ['Pending','Approved','Declined'];
   List<PetModel> pets = [];
 
@@ -46,38 +46,38 @@ class _ShowAppointmentState extends State<ShowAppointment> {
       for (int i = 0; i < 10; i++) {
         text.add(TextEditingController());
       }
-      apointment = widget.apointment;
+      apointment = widget.apointment!;
     });
     initLoadData();
   }
 
   initLoadData() async {
-    ClinicModel _clinic = await ClinicController.getClinic(apointment?.clinic_id??"");
-    UserModel _user = await UserController.getUser(apointment?.pet_owner_id??"");
-    apointment?.pet_list_ids?.forEach((id) async {
+    ClinicModel _clinic = await ClinicController.getClinic(apointment.clinic_id??"");
+    UserModel _user = await UserController.getUser(apointment.pet_owner_id??"");
+    apointment.pet_list_ids?.forEach((id) async {
       PetModel pet = await PetController.getPet(id);
       setState(() {
         pets.add(pet);
       });  
     });
-    if(apointment?.clinic_read_status == "" || apointment?.clinic_read_status == "false" || apointment?.pet_owner_read_status == null){
-      apointment?.clinic_read_status = 'true';
-      await ApointmentController.updateApointment(apointment!);
+    if(apointment.clinic_read_status == "" || apointment.clinic_read_status == "false" || apointment.pet_owner_read_status == null){
+      apointment.clinic_read_status = 'true';
+      await ApointmentController.updateApointment(apointment);
     }
     if(apointment != null){
       setState(() {
         clinic = _clinic;
         user = _user;
-        apointment?.clinic_read_status = 'true';
-        text[0].text = apointment?.reason??"";
-        DateTime sched = DateTime.parse(apointment?.schedule_datetime??"");
+        apointment.clinic_read_status = 'true';
+        text[0].text = apointment.reason??"";
+        DateTime sched = DateTime.parse(apointment.schedule_datetime??"");
         text[1].text = "${DateFormat.yMMMEd().add_jm().format(sched)}";
       });
     }
   }
 
   void reSchedule() async {
-     DateTime sched = DateTime.parse(apointment?.schedule_datetime??"");
+     DateTime sched = DateTime.parse(apointment.schedule_datetime??"");
     final date = await showDatePicker(
                           context: context,
                           firstDate: DateTime(1900),
@@ -87,16 +87,30 @@ class _ShowAppointmentState extends State<ShowAppointment> {
     if (date != null) {
       final time = await showTimePicker(context: context,initialTime:TimeOfDay.fromDateTime(sched ?? DateTime.now()),);
       setState(() {
-        apointment?.schedule_datetime = DateTimeField.combine(date, time).toString();
-        apointment?.pet_owner_read_status = 'false';
+        apointment.schedule_datetime = DateTimeField.combine(date, time).toString();
+        apointment.pet_owner_read_status = 'false';
       });
-      if(await ApointmentController.updateApointment(apointment!)){
-        FirebaseMessagingService.sendMessageNotification(notification_type[1], "Doc ${await DataStorage.getData('username')}", 'Reschedule Apointment', '${user?.fullname} your schedule will be moved on ${apointment?.schedule_datetime}', user!.fcm_tokens!,{});
+      if(await ApointmentController.updateApointment(apointment)){
+        FirebaseMessagingService.sendMessageNotification(notification_type[1], "Doc ${await DataStorage.getData('username')}", 'Reschedule Apointment', '${user?.fullname} your schedule will be moved on ${apointment.schedule_datetime}', user!.fcm_tokens!,{});
         Navigator.pop(context);
         CherryToast.success(title: Text('Appointment Postponed')).show(context);
       }else{
         CherryToast.error(title: Text('Appointment Postponed Error')).show(context);
       }
+    }
+  }
+  
+  void setCompleted() async {
+    setState(() {
+      apointment.status = 'Completed';
+      apointment.pet_owner_read_status = 'false';
+    });
+    if(await ApointmentController.updateApointment(apointment)){
+      FirebaseMessagingService.sendMessageNotification(notification_type[1], "Doc ${await DataStorage.getData('username')}", 'Apointment Completed', '${user?.fullname} your appointment is set to completed', user!.fcm_tokens!,{});
+      Navigator.pop(context);
+      CherryToast.success(title: Text('Appointment Completed')).show(context);
+    }else{
+      CherryToast.error(title: Text('Appointment Completed Error')).show(context);
     }
   }
 
@@ -208,28 +222,14 @@ class _ShowAppointmentState extends State<ShowAppointment> {
     if(status == "Declined"){
       return text4Color;
     }
+    if(status == "Completed"){
+      return secondaryColor;
+    }
     return text6Color;
   }
 
-  Widget formAppointment(){
-    return Form(
-      key: _key,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(apointment?.status??"",style: TextStyle(fontSize: 23,fontWeight: FontWeight.bold, color: statusColor(apointment?.status??"")),),
-          _textFormField("Reason", 0, TextInputType.multiline),
-          getDateAppointment(1),
-          const Padding(
-            padding: EdgeInsets.only(top: 10),
-            child: Text('Pets',style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold)),
-          ),
-          SizedBox(
-            height: 100,
-            width: double.infinity,
-            child: petList(),
-          ),
+  List<Widget> formButtons(){
+    return !apointment.status!.contains('Completed') ? [
           SizedBox(
             height: 5,
           ),
@@ -260,7 +260,39 @@ class _ShowAppointmentState extends State<ShowAppointment> {
               child: Text('Decline'),
             )
           ),
-        ],
+          SizedBox(
+            height: 5,
+          ),
+          ElevatedButton(
+            style: buttonStyleA(250,50,1,secondaryColor),
+            onPressed: () async => setCompleted(), 
+            child: Center(
+              child: Text('Completed'),
+            )
+          ),
+        ] : [];
+  }
+
+  Widget formAppointment(){
+    return Form(
+      key: _key,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(apointment.status??"",style: TextStyle(fontSize: 23,fontWeight: FontWeight.bold, color: statusColor(apointment.status??"")),),
+          _textFormField("Reason", 0, TextInputType.multiline),
+          getDateAppointment(1),
+          const Padding(
+            padding: EdgeInsets.only(top: 10),
+            child: Text('Pets',style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold)),
+          ),
+          SizedBox(
+            height: 100,
+            width: double.infinity,
+            child: petList(),
+          ),
+        ] + formButtons(),
       ),
     );
   }

@@ -207,3 +207,32 @@ class ClinicModel{
         "fcm_tokens" : fcm_tokens
       };
 }
+
+class ClinicScheduleModel{
+  String? id,clinic_day,clinic_opening,clinic_closing;
+  int? order;
+
+  ClinicScheduleModel(
+    this.id,
+    this.clinic_day,
+    this.clinic_opening,
+    this.clinic_closing,
+    this.order,
+  );
+
+  ClinicScheduleModel.fromMap(Map<String, dynamic> json)
+      : id = json['id'],
+        clinic_day = json['clinic_day'],
+        clinic_opening = json['clinic_opening'],
+        clinic_closing = json['clinic_closing'],
+        order = json['order']
+    ;
+
+  Map<String, dynamic> toMap() => {
+        "id" : id,
+        "clinic_day" : clinic_day,
+        "clinic_opening" : clinic_opening,
+        "clinic_closing" : clinic_closing,
+        "order" : order
+      };
+}

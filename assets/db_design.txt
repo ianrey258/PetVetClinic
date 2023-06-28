@@ -32,9 +32,15 @@ Clinics:
 - clinic_lat
 - clinic_long
 - clinic_rating
+- clinic_schedule:ClinicSchedule
 - services
 - fcm_tokens
 - rating_review:RatingReviews
+
+ClinicSchedule:
+- clinic_service_day 
+- clinic_close_time
+- clinic_open_time
 
 Apointments:
 - pet_owner_id

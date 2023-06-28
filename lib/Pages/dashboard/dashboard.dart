@@ -184,7 +184,7 @@ class _DashboardState extends State<Dashboard> {
         drawerContainerItem(FontAwesomeIcons.message,'Messages'),
         // drawerContainerItem(Icons.history,'History'),
         drawerContainerItem(Icons.reviews_outlined,'Reviews'),
-        // drawerContainerItem(FontAwesomeIcons.userGear,'Settings'),
+        drawerContainerItem(FontAwesomeIcons.userGear,'Settings'),
         drawerContainerItem(Icons.logout,'Logout'),
       ],
     );

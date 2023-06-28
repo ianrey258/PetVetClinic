@@ -27,7 +27,7 @@ class _ApointmentsState extends State<Apointments> {
   List<TextEditingController> text = [];
   final _key = GlobalKey<FormState>();
   List<Map<String,Object>> apointments = [];
-  List<String> status = ['Pending','Approved','Declined'];
+  List<String> status = ['Pending','Approved','Declined','Completed'];
   bool refresh = false;
 
   @override
@@ -46,7 +46,7 @@ class _ApointmentsState extends State<Apointments> {
     List _apointments = await ApointmentController.getApointments();
     debugPrint(_apointments.length.toString());
     _apointments.forEach((apointment) async {
-      if(apointment.status.toString() == status[1]){
+      if(apointment.status.toString() == status[1] || apointment.status.toString() == status[3]){
         debugPrint(apointment.pet_owner_id);
         UserModel _user = await UserController.getUser(apointment.pet_owner_id??'');
         setState(() {  
@@ -118,8 +118,31 @@ class _ApointmentsState extends State<Apointments> {
       ),
     );   
   }
+  
+  Widget apointmentCompleted(Map _apointments) {
+    ClinicApointmentModel? apointment = _apointments['apointment'];
+    UserModel? user = _apointments['user'];
+    return Card(
+      elevation: 5,
+      child: ListTile(
+        style: ListTileStyle.list,
+        leading: user?.profile_img != "" ? ImageLoader.loadImageNetwork(user?.profile_img??"",50.0,50.0) : FaIcon(Icons.store,size: 50),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(user?.username??""),
+            Text("${DateFormat.yMd().format(DateTime.parse(apointment?.schedule_datetime??""))}")
+          ],
+        ),
+        subtitle: Text(apointment?.status??""),
+        onTap: ()=> showAppointment(apointment!),
+      ),
+    );   
+  }
 
   List<Widget> apointmentList(){
+    List<Map> is_not_completed = apointments.where((Map data) => data['apointment'].status != 'Completed').toList();
+    List<Map> is_completed = apointments.where((Map data) => data['apointment'].status == 'Completed').toList();
     if(apointments.isEmpty){
       return [
         Center(
@@ -128,7 +151,7 @@ class _ApointmentsState extends State<Apointments> {
         )
       ];
     }
-    return apointments.map((Map data) => apointment(data)).toList();
+    return is_not_completed.map((Map data) => apointment(data)).toList() + [Divider(thickness: 2,height: 8,)] + is_completed.map((Map data) => apointmentCompleted(data)).toList();
   }
 
   @override

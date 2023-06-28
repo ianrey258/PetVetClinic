@@ -216,6 +216,22 @@ class _ClinicProfileState extends State<ClinicProfile> {
       ),
     );
   }
+  
+  Widget setScheduleService(){
+    return Container(
+      padding: EdgeInsets.only(top: 10,bottom: 10),
+      child: FilledButton.icon(
+        onPressed: () async {
+          Navigator.pushNamed(context, '/clinic_schedule');
+        },
+        icon: Container(),
+        label: Center(
+          child: Text('Set Service Schedule',style: TextStyle(color: secondaryColor),),
+        ),
+        style: buttonStyleA(150, 50, 10, primaryColor),
+      ),
+    );
+  }
 
   Widget imageLoad(String path,double width,double height){
     return path.contains(clinic?.id??"") ? ImageLoader.loadImageNetwork(path,width,height) : ImageLoader.loadImageFile(path,width,height);
@@ -340,7 +356,8 @@ class _ClinicProfileState extends State<ClinicProfile> {
                   color: text3Color,
                 ),
                 clinicServices(),
-                setServices()
+                setServices(),
+                setScheduleService(),
               ],
             ),
           ),
